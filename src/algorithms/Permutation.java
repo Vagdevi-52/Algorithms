@@ -25,7 +25,7 @@ public class Permutation
 			}
 		}
 	}	
-	public String swap(String a, int i, int j) //use swap method  charcters at the  position
+	public String swap(String a, int i, int j) //use swap method for  charcters at the  position
 	{
 		char temp;
 		char[] charArray = a.toCharArray();
