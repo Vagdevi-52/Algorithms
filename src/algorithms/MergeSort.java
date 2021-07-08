@@ -1,108 +1,75 @@
 package algorithms;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Comparator;
 
-public class MergeSort 
-{
-	public <T> void sort(T[] values, Class<T> clazz, Comparator<T> comparator)
-	{
-        if (values == null)
-        {
-            throw new IllegalArgumentException("values is null.");
-        }
+public class MergeSort<T extends Comparable<T>> {
 
-        // recursion exit criteria.
-        if (values.length < 2)
-        {
-            return;
-        }
-
-        // segregate the values array into 2 halves.
-        int median = values.length / 2;
-        int leftSize = median;
-        int rightSize = values.length - median;
-
-        // construct the left array.
-        T[] left = (T[]) Array.newInstance(clazz, leftSize);
-        for (int l = 0; l < leftSize; ++l) 
-        {
-            left[l] = values[l];
-        }
-
-        // construct the right array.
-        T[] right = (T[]) Array.newInstance(clazz, rightSize);
-        for (int r = 0; r < rightSize; ++r) 
-        {
-            right[r] = values[leftSize + r];
-        }
-
-        // recursively do merge sort on either side of the array.
-        sort(left, clazz, comparator);
-        sort(right, clazz, comparator);
-
-        // merges the left and right and keeps the intermediate
-        // values array sorted as it works it's way up.
-        _merge(values, left, right, comparator);
-
-    }
-
-    private <T> void _merge(T[] values, T[] left, T[] right, Comparator<T> comparator)
+	// merges two subarrays of array[].
+    void merge(T[] array, int start, int middle, int end)
     {
-        int leftIndex = 0;
-        int rightIndex = 0;
-        int sortedIndex = 0;
+        T[] leftArray  = (T[]) new Comparable[middle - start + 1];
+        T[] rightArray = (T[]) new Comparable[end - middle];
 
-        while (leftIndex < left.length && rightIndex < right.length) 
+        // fill in left array
+        for (int i = 0; i < leftArray.length; ++i)
+            leftArray[i] = array[start + i];
+
+        // fill in right array
+        for (int i = 0; i < rightArray.length; ++i)
+            rightArray[i] = array[middle + 1 + i];
+
+        /*  Merge the temp arrays */
+
+        // initial indexes of first and second subarrays
+        int leftIndex = 0, rightIndex = 0;
+
+        // the index we will start by adding the subarrays back into the main array
+        int currentIndex = start;
+
+        // compare each index of the subarrays  by adding the low value to the currentIndex
+        while (leftIndex < leftArray.length && rightIndex < rightArray.length)
         {
-            int comparison = comparator.compare(left[leftIndex], right[rightIndex]);
-            if (comparison <= 0) 
+            if (leftArray[leftIndex].compareTo(rightArray[rightIndex]) <= 0)
             {
-                values[sortedIndex] = left[leftIndex];
+                array[currentIndex] = leftArray[leftIndex];
                 leftIndex++;
             }
             else
             {
-                values[sortedIndex] = right[rightIndex];
+                array[currentIndex] = rightArray[rightIndex];
                 rightIndex++;
             }
-            sortedIndex++;
+            currentIndex++;
         }
 
-        // Handle the left over elements if any in the left side
-        // and places them in the sorted array.
-        while (leftIndex < left.length)
-        {
-            values[sortedIndex] = left[leftIndex];
-            leftIndex++;
-            sortedIndex++;
-        }
+        // remaining elements of leftArray[]
+        while (leftIndex < leftArray.length) array[currentIndex++] = leftArray[leftIndex++];
 
-        // Handle the left over elements if any in the right side.
-        // and places them in the sorted array.
-        while (rightIndex < right.length)
-        {
-            values[sortedIndex] = right[rightIndex];
-            rightIndex++;
-            sortedIndex++;
-        }
+        // remaining elements of rightArray[]
+        while (rightIndex < rightArray.length) array[currentIndex++] = rightArray[rightIndex++];
     }
-
-    public static void main(String[] args)
+    // main function that sorts start..end using merge()
+    void mergeSort(T[] array, int start, int end)
     {
-        String[] values = new String[] { "A","m","m","a","a" };
-        System.out.println("Befor Sorting the values: " +Arrays.toString(values));
+        // base case
+        if (start < end)
+        {
+            // find the middle point between start to end.
+            int middle = (start + end) / 2;
 
-        new MergeSort().sort(values, String.class, new Comparator<String>() {
+            mergeSort(array, start, middle); // sort first half
+            mergeSort(array, middle + 1, end);  // sort second half
 
-            @Override
-            public int compare(String o1, String o2)
-            {
-                return o1.compareTo(o2);
-            }
-        });
-
-        System.out.println("After sorting the values: " +Arrays.toString(values));
+            // merge the sorted halves values.
+            merge(array, start, middle, end);
+        }
     }
+    
+    public static void main(String[] args) {
+    	 String[] arrayOfStrings = {"Time", "is", "valuable", "dont", "waste", "your","time"};
+         MergeSort<String> stringSorter   = new MergeSort<>();
+         stringSorter.mergeSort(arrayOfStrings, 0, arrayOfStrings.length - 1);
+         System.out.println("Array after sorting ::\n"+Arrays.toString(arrayOfStrings));
+	}
+    
 }
